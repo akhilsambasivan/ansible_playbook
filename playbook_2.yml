@@ -1,0 +1,53 @@
+-
+ name: Install packages
+ hosts: ubuntu 
+ tasks: 
+   - apt: name=python state=present
+   - apt: name=python-setuptools state=present
+   - apt: name=python-dev state=present
+   - apt: name=build-essential state=present
+   - apt: name=python-pip state=present
+   - apt: name=python-mysqldb state=present
+   - apt: name=mysql-server state=present
+   - apt: name=mysql-client state=present
+   - apt: name=python3-flask state=present 
+
+   -
+    name: Start MySQL Server
+    hosts: ubuntu
+    command: service mysql start
+    state: started
+   
+   -
+    name: Create DB in MySQL
+    hosts: ubuntu
+    mysql_db: db=employee_db state=present
+   
+   -
+    name: Create MySQL username
+    mysql_user:
+     name: db_user
+     password: 12345
+     priv: '*.*:ALL'
+     state: present
+     host: '%'
+   
+   -
+    name: example copying file with owner and permissions
+    copy:
+     src: /root/ansible_master/Insert.sql
+     dest: /tmp/Insert.sql
+     owner: root
+     group: root
+     mode: 0644
+   -
+    name: Run SQL commands against DB to create table
+    hosts: ubuntu
+    mysql_db:
+      login_host: localhost
+      login_password: "{{ 12345 }}"
+      login_user: db_user 
+      name:  employee_db
+      state: import
+      target: /tmp/Insert.sql
+     

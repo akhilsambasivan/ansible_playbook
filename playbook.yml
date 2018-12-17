@@ -1,0 +1,7 @@
+-
+ name: Deploy Web application
+ hosts: ubuntu
+ tasks: 
+     - 
+      name: try ping
+      ping:     
